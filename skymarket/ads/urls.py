@@ -6,10 +6,10 @@ from ads.views import AdViewSet, CommentViewSet
 
 
 ads_router = SimpleRouter()
-ads_router.register(r'ads', AdViewSet)
+ads_router.register('ads', AdViewSet, basename='ads')
 
 comments_router = NestedSimpleRouter(ads_router, 'ads', lookup='ad')
-comments_router.register(r'comments', CommentViewSet)
+comments_router.register('comments', CommentViewSet)
 
 urlpatterns = [
     path('', include(ads_router.urls)),

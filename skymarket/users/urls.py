@@ -8,7 +8,7 @@ users_router = SimpleRouter()
 users_router.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
-    path('', include('djoser.urls')),
-    path('token/', TokenObtainPairView.as_view()),
-    path('token/refresh/', TokenRefreshView.as_view()),
+    path('', include(users_router.urls)),
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

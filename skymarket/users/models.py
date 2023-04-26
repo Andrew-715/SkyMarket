@@ -13,6 +13,8 @@ class User(AbstractBaseUser):
     image = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     is_active = models.BooleanField(default=True)
 
+    objects = UserManager()
+
     @property
     def is_superuser(self):
         return self.is_admin
@@ -36,6 +38,4 @@ class User(AbstractBaseUser):
         return self.role == UserRoles.USER
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone', 'role']
-
-    objects = UserManager()
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone', 'role', 'image']
