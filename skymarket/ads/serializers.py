@@ -3,50 +3,42 @@ from rest_framework import serializers
 from ads.models import Comment, Ad
 
 
-class AuthorInformationMixin(serializers.ModelSerializer):
-    pk = serializers.IntegerField(required=False)
-    author_id = serializers.IntegerField(required=False)
-
-    author_first_name = serializers.SerializerMethodField()
-    author_last_name = serializers.SerializerMethodField()
-    phone = serializers.SerializerMethodField()
-
-    def get_author_first_name(self, obj):
-        author_first_name = obj.author.first_name
-        return author_first_name
-
-    def get_author_last_name(self, obj):
-        author_last_name = obj.author.last_name
-        return author_last_name
-
-    def get_phone(self, obj):
-        try:
-            phone = obj.author.phone.as_e164
-            return phone
-        except:
-            return None
-
-
-class CommentSerializer(AuthorInformationMixin):
-    ad_id = serializers.IntegerField(required=False)
+class CommentSerializer(serializers.ModelSerializer):
+    author_id = serializers.IntegerField(source='author.id', read_only=True)
+    ad_id = serializers.IntegerField(source='ad.id', read_only=True)
+    author_first_name = serializers.CharField(source='author.first_name', read_only=True)
+    author_last_name = serializers.CharField(source='author.last_name', read_only=True)
+    author_image = serializers.ImageField(source='author.image', read_only=True)
 
     class Meta:
         model = Comment
-        exclude = ['id', 'author', 'ad']
+        fields = (
+            'pk',
+            'text',
+            'author_id',
+            'ad_id',
+            'author_first_name',
+            'author_last_name',
+            'author_image',
+        )
 
 
-class AdSerializer(AuthorInformationMixin):
+class AdSerializer(serializers.ModelSerializer):
+    author_id = serializers.IntegerField(source='author.id', read_only=True)
+    author_first_name = serializers.CharField(source='author.first_name', read_only=True)
+    author_last_name = serializers.CharField(source='author.last_name', read_only=True)
+    phone = serializers.CharField(source='author.phone', read_only=True)
+
     class Meta:
         model = Ad
-        fields = '__all__'
-
-
-class AdDetailSerializer(AuthorInformationMixin):
-    class Meta:
-        model = Ad
-        fields = '__all__'
-
-class AdCreateSerializer(AuthorInformationMixin):
-    class Meta:
-        model = Ad
-        exclude = ['create_at', 'id', 'author']
+        fields = (
+            'pk',
+            'title',
+            'description',
+            'price',
+            'author_id',
+            'author_first_name',
+            'author_last_name',
+            'image',
+            'phone',
+        )

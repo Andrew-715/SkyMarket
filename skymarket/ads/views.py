@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from ads.filters import AdFilter
 from ads.models import Ad, Comment
-from ads.serializers import CommentSerializer, AdSerializer, AdDetailSerializer
+from ads.serializers import CommentSerializer, AdSerializer
 
 
 class AdPagination(pagination.PageNumberPagination):
@@ -19,11 +19,6 @@ class AdViewSet(viewsets.ModelViewSet):
     filterset_class = AdFilter
     serializer_class = AdSerializer
 
-    def get_queryset(self):
-        if self.action == 'me':
-            return Ad.objects.filter(author=self.request.user).all()
-        return Ad.objects.all()
-
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'create', 'me']:
             self.permission_classes = [IsAuthenticated]
@@ -31,19 +26,12 @@ class AdViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAdminUser]
         return super().get_permissions()
 
-    def get_serializer_class(self):
-        if self.action == 'retrieve':
-            return AdDetailSerializer
-        return AdSerializer
-
     @action(detail=False, methods=['get'])
     def me(self, request, *args, **kwargs):
         return super().list(self, request, *args, **kwargs)
 
-    def create(self, request, *args, **kwargs):
-        request.data._mutable = True
-        request.data['author'] = request.user.pk
-        return super().create(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -54,4 +42,3 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Comment.objects.prefetch_related('author')\
             .filter(ad=self.kwargs['ad_pk'])
-
