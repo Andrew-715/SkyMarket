@@ -1,4 +1,4 @@
-# Сайт объявлений SkyMarket (backend)
+# Сайт объявлений Small_Market (backend)
 ____
 ### Cтек приложения:
 - **Python 3.10**
